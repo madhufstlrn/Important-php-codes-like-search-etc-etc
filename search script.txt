@@ -1,0 +1,72 @@
+document.getElementById('available').style.display = 'none';
+
+    var formdata = $('#grnrcpt').serialize();
+    var selected = $("#cat option:selected");
+    var message = "";
+    selected.each(function () {
+        message += $(this).val() + ",";
+    });
+    var cat1 = message;
+
+    $.ajax({
+        'type': "POST",
+        //'url': "stores_reports/rep_grn_reportget.php?cat1=" + cat1,
+        'url': "../stores_reports_test/ukml_stores/rep_inwardpr_reportget.php?cat1=" + cat1,
+        'dataType': "html",
+        'data': formdata,
+        'beforeSend': function () {
+            $('#loading').show();
+        },
+        'complete': function () {
+            $('#loading').hide();
+        },
+        'success': function (data) {
+            //alert(data);
+
+            document.getElementById('available').style.display = 'inline';
+
+            document.getElementById("available").innerHTML = data;
+
+            console.log(data);
+            console.log($('#example'));
+
+            //$(document).ready(function () {
+            //   $("#exa").hide(); 
+            $('#examplenew').freezeHeader({'height': '300px'});
+            var lastIdx = null;
+            $('#example').DataTable({
+                filename: ' REPORT',
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        footer: true,
+                        title: 'GOODS INWARD REPORT',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+
+                    'colvis'
+                ],
+            });
+
+
+
+            $('#example tbody')
+                    .on('mouseover', 'td', function () {
+                        var colIdx = table.cell(this).index().column;
+                        if (colIdx !== lastIdx) {
+                            $(table.cells().nodes()).removeClass('highlight');
+                            $(table.column(colIdx).nodes()).addClass('highlight');
+                        }
+                    })
+                    .on('mouseleave', function () {
+                        $(table.cells().nodes()).removeClass('highlight');
+                    });
+            //});
+        }
+    });
+
+   
+}
